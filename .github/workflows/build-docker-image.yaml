@@ -113,10 +113,10 @@ jobs:
       - name: Create Versioned Manifest (GHCR) (${{ github.ref_name }})
         run: |
           docker buildx imagetools create -t ghcr.io/aldinokemal/go-whatsapp-web-multidevice:${{ github.ref_name }} \
-            ghcr.io/${{ github.repository_owner }}/go-whatsapp-web-multidevice:${{ github.ref_name }}-amd \
-            ghcr.io/${{ github.repository_owner }}/go-whatsapp-web-multidevice:${{ github.ref_name }}-arm
+            ghcr.io/aldinokemal/go-whatsapp-web-multidevice:${{ github.ref_name }}-amd \
+            ghcr.io/aldinokemal/go-whatsapp-web-multidevice:${{ github.ref_name }}-arm
       - name: Create Latest Manifest (GHCR)
         run: |
           docker buildx imagetools create -t ghcr.io/aldinokemal/go-whatsapp-web-multidevice:latest \
-            ghcr.io/${{ github.repository_owner }}/go-whatsapp-web-multidevice:latest-amd \
-            ghcr.io/${{ github.repository_owner }}/go-whatsapp-web-multidevice:latest-arm
+            ghcr.io/aldinokemal/go-whatsapp-web-multidevice:latest-amd \
+            ghcr.io/aldinokemal/go-whatsapp-web-multidevice:latest-arm
