@@ -91,6 +91,9 @@ func initEnvConfig() {
 		credential := strings.Split(envBasicAuth, ",")
 		config.AppBasicAuthCredential = credential
 	}
+	if envBasePath := viper.GetString("app_base_path"); envBasePath != "" {
+		config.AppBasePath = envBasePath
+	}
 
 	// Database settings
 	if envDBURI := viper.GetString("db_uri"); envDBURI != "" {
@@ -116,6 +119,9 @@ func initEnvConfig() {
 	}
 	if viper.IsSet("whatsapp_account_validation") {
 		config.WhatsappAccountValidation = viper.GetBool("whatsapp_account_validation")
+	}
+	if envBaseURL := viper.GetString("base_url"); envBaseURL != "" {
+		config.BaseURL = envBaseURL
 	}
 }
 
@@ -145,6 +151,12 @@ func initFlags() {
 		"basic-auth", "b",
 		config.AppBasicAuthCredential,
 		"basic auth credential | -b=yourUsername:yourPassword",
+	)
+	rootCmd.PersistentFlags().StringVarP(
+		&config.AppBasePath,
+		"base-path", "",
+		config.AppBasePath,
+		`base path for subpath deployment --base-path <string> | example: --base-path="/gowa"`,
 	)
 
 	// Database flags
@@ -191,6 +203,12 @@ func initFlags() {
 		"account-validation", "",
 		config.WhatsappAccountValidation,
 		`enable or disable account validation --account-validation <true/false> | example: --account-validation=true`,
+	)
+	rootCmd.PersistentFlags().StringVarP(
+		&config.BaseURL,
+		"base-url", "",
+		config.BaseURL,
+		`base url for media --base-url <string> | example: --base-url="https://example.com"`,
 	)
 }
 

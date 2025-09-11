@@ -5,12 +5,13 @@ import (
 )
 
 var (
-	AppVersion             = "v7.3.1"
+	AppVersion             = "v7.4.0"
 	AppPort                = "3000"
 	AppDebug               = false
 	AppOs                  = "AldinoKemal"
 	AppPlatform            = waCompanionReg.DeviceProps_PlatformType(1)
 	AppBasicAuthCredential []string
+	AppBasePath            = ""
 
 	McpPort = "8080"
 	McpHost = "localhost"
@@ -27,6 +28,7 @@ var (
 	WhatsappAutoMarkRead           = false // Auto-mark incoming messages as read
 	WhatsappWebhook                []string
 	WhatsappWebhookSecret                = "secret"
+	BaseURL                              = ""
 	WhatsappLogLevel                     = "ERROR"
 	WhatsappSettingMaxImageSize    int64 = 20000000  // 20MB
 	WhatsappSettingMaxFileSize     int64 = 50000000  // 50MB
