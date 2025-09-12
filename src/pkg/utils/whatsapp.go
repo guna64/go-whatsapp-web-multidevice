@@ -603,21 +603,45 @@ func GetMessageDigestOrSignature(msg, key []byte) (string, error) {
 
 // BuildEventMessage builds event message structure
 func BuildEventMessage(evt *events.Message) (message EvtMessage) {
-	message.Text = evt.Message.GetConversation()
 	message.ID = evt.Info.ID
 
+	// Default to conversation text
+	message.Text = evt.Message.GetConversation()
+
+	// Handle various message types
 	if extendedMessage := evt.Message.GetExtendedTextMessage(); extendedMessage != nil {
 		message.Text = extendedMessage.GetText()
-		message.RepliedId = extendedMessage.ContextInfo.GetStanzaID()
-		message.QuotedMessage = extendedMessage.ContextInfo.GetQuotedMessage().GetConversation()
-	} else if protocolMessage := evt.Message.GetProtocolMessage(); protocolMessage != nil {
-		if editedMessage := protocolMessage.GetEditedMessage(); editedMessage != nil {
-			if extendedText := editedMessage.GetExtendedTextMessage(); extendedText != nil {
-				message.Text = extendedText.GetText()
-				message.RepliedId = extendedText.ContextInfo.GetStanzaID()
-				message.QuotedMessage = extendedText.ContextInfo.GetQuotedMessage().GetConversation()
+		if ctx := extendedMessage.GetContextInfo(); ctx != nil {
+			message.RepliedId = ctx.GetStanzaID()
+			if qm := ctx.GetQuotedMessage(); qm != nil {
+				message.QuotedMessage = ExtractMessageTextFromProto(qm)
 			}
 		}
+	} else if protocolMessage := evt.Message.GetProtocolMessage(); protocolMessage != nil {
+		if editedMessage := protocolMessage.GetEditedMessage(); editedMessage != nil {
+			message.Text = editedMessage.GetConversation()
+			if extendedText := editedMessage.GetExtendedTextMessage(); extendedText != nil {
+				message.Text = extendedText.GetText()
+				if ctx := extendedText.GetContextInfo(); ctx != nil {
+					message.RepliedId = ctx.GetStanzaID()
+					if qm := ctx.GetQuotedMessage(); qm != nil {
+						message.QuotedMessage = ExtractMessageTextFromProto(qm)
+					}
+				}
+			}
+		}
+	} else if img := evt.Message.GetImageMessage(); img != nil {
+		message.Text = img.GetCaption()
+	} else if vid := evt.Message.GetVideoMessage(); vid != nil {
+		message.Text = vid.GetCaption()
+	} else if doc := evt.Message.GetDocumentMessage(); doc != nil {
+		message.Text = doc.GetCaption()
+	} else if buttonsResponse := evt.Message.GetButtonsResponseMessage(); buttonsResponse != nil {
+		message.Text = buttonsResponse.GetSelectedDisplayText()
+	} else if listResponse := evt.Message.GetListResponseMessage(); listResponse != nil {
+		message.Text = listResponse.GetTitle()
+	} else if templateButtonReply := evt.Message.GetTemplateButtonReplyMessage(); templateButtonReply != nil {
+		message.Text = templateButtonReply.GetSelectedDisplayText()
 	}
 
 	return message
